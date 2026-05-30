@@ -38,9 +38,23 @@ jobs:
           mkdir -p dist
           tar -czf dist/application.tar.gz .
 
+      - name: Register build artifact
+        id: register-artifact
+        uses: cloudbees-io/register-build-artifact@v2
+        with:
+          name: customer-portal
+          version: "1.0.0"
+          url: docker.io/alvarotoscano/customer-portal:1.0.0
+
       - name: Simulate deployment to staging
         uses: docker://node:20-alpine
         shell: sh
         run: |
           echo "Deploying application to staging..."
           echo "Deployment completed successfully"
+      
+      - name: Register deployment
+        uses: cloudbees-io/register-deployed-artifact@v2
+        with:
+          artifact-id: ${{ steps.register-artifact.outputs.artifact-id }}
+          target-environment: staging
