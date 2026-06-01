@@ -4,6 +4,13 @@ name: nodejs-standard
 
 on:
   workflow_call:
+    inputs:
+      application-name:
+        required: true
+      version:
+        required: true
+      target-environment:
+        required: true
 
 jobs:
   build-test-security:
@@ -13,19 +20,19 @@ jobs:
       - name: Checkout source code
         uses: cloudbees-io/checkout@v1
 
-      - name: Install dependencies
+      - name: Standard Build Process
         uses: docker://node:20-alpine
         shell: sh
         run: |
           npm install
 
-      - name: Run dependency security audit
+      - name: Enforce Corporate Security Policy
         uses: docker://node:20-alpine
         shell: sh
         run: |
           npm audit --audit-level=high
 
-      - name: Run application tests
+      - name: Corporate Quality Gate
         uses: docker://node:20-alpine
         shell: sh
         run: |
@@ -38,12 +45,12 @@ jobs:
           mkdir -p dist
           tar -czf dist/application.tar.gz .
 
-      - name: Register build artifact
+      - name: Register Artifact for Traceability
         id: register-artifact
         uses: cloudbees-io/register-build-artifact@v2
         with:
-          name: customer-portal
-          version: "1.0.0"
+          name: ${{ inputs.application-name}}
+          version: ${{ inputs.version}}
           url: docker.io/alvarotoscano/customer-portal:1.0.0
 
       - name: Simulate deployment to staging
@@ -53,8 +60,8 @@ jobs:
           echo "Deploying application to staging..."
           echo "Deployment completed successfully"
       
-      - name: Register deployment
+      - name: Register Deployment for Compliance
         uses: cloudbees-io/register-deployed-artifact@v2
         with:
           artifact-id: ${{ steps.register-artifact.outputs.artifact-id }}
-          target-environment: STAGING
+          target-environment: ${{ inputs.target-environment}}
