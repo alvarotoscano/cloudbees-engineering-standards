@@ -51,13 +51,13 @@ jobs:
         with:
           name: ${{ inputs.application-name}}
           version: ${{ inputs.version}}
-          url: docker.io/alvarotoscano/customer-portal:1.0.0
+          url: docker.io/alvarotoscano/${{ inputs.application-name }}:${{ inputs.version }}
 
-      - name: Simulate deployment to staging
+      - name: Standardized Deplyment Process
         uses: docker://node:20-alpine
         shell: sh
         run: |
-          echo "Deploying application to staging..."
+          echo "Deploying application to ${{ inputs.target-environment }}..."
           echo "Deployment completed successfully"
       
       - name: Register Deployment for Compliance
